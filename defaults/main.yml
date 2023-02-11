@@ -1,0 +1,10 @@
+---
+# main.yml for nerve4-chkrootkit
+
+## install_el8.yml variables amd values
+rhel8_pkgs:
+  - tar
+  - make
+  - g++
+
+chkroot_release: 0.56

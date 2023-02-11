@@ -1,0 +1,7 @@
+---
+# tasks - install_ubuntu.yml for nerve4-chkrootkit
+
+- name: Install chkrootkit on Ubuntu based hosts
+  ansible.builtin.apt: 
+    name: "chkrootkit"
+    state: present

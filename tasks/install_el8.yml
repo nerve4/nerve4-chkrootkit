@@ -1,0 +1,46 @@
+---
+# tasks - install_el8.yml for nerve4-chkrootkit
+
+- name: Install aide on RHEL8 based hosts
+  ansible.builtin.dnf: 
+    name: "{{ rhel8_pkgs }}"
+    state: present
+
+- name: Install the latest version of glibc-static from the crb repo
+  ansible.builtin.dnf:
+    name: glibc-static
+    enablerepo: crb
+    state: present
+
+- name: Download chkrootkit binary to local folder
+  ansible.builtin.get_url:
+    url: ftp://chkrootkit.org/pub/seg/pac/chkrootkit.tar.gz
+    dest: /tmp/chkrootkit.tar.gz
+
+- name: Create chkroot directory on the remote machine
+  ansible.builtin.file:
+    path: /usr/local/chkrootkit
+    state: directory
+    mode: '0755'
+
+- name: Unarchive the chkrootkit binary on the remote machine
+  ansible.builtin.unarchive:
+    src: /tmp/chkrootkit.tar.gz
+    dest: /usr/local/chkrootkit
+    remote_src: yes
+
+- name: Move chkrootkit files to upper level
+  ansible.builtin.shell: |
+    mv /usr/local/chkrootkit/chkrootkit-{{ chkroot_release }}/* /usr/local/chkrootkit/
+
+- name: remove old directory
+  ansible.builtin.file:
+    path: /usr/local/chkrootkit/chkrootkit-{{ chkroot_release }}
+    state: absent
+
+- name: Install chkrootkit
+  become: yes
+  ansible.builtin.shell: |
+    make sense
+  args:
+    chdir: /usr/local/chkrootkit
